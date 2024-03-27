@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 
-from .models import Topic
+from .models import Topic, Entry
 from .forms import TropicForm, EntryFrom
 
 
@@ -55,8 +55,28 @@ def new_entry(request, topic_id):
             new_entry = form.save(commit=False)
             new_entry.topic = topic
             new_entry.save()
-            return redirect("learning_logs:topic", topic_id=topic_id)
+            return redirect("learning_logs:topic", topic_id=topic.id)
 
     # display a blank or invalid form
     context = {"topic": topic, "form": form}
+    return render(request, "learning_logs/new_entry.html", context)
+
+
+def edit_entry(request, entry_id):
+    """edit existing entry"""
+    entry = Entry.objects.get(id=entry_id)
+    topic = entry.topic
+
+    if request.method != "POST":
+        # initial request, prefill form with current entry
+        form = EntryForm(instance=entry)
+    else:
+        # POST data submitted, process data
+        form = EntryForm(instance=entry, data=request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("learning_logs:topic", topic_id=topic.id)
+
+    # display a blank or invalid form
+    context = {"entry": entry, "topic": topic, "form": form}
     return render(request, "learning_logs/new_entry.html", context)
