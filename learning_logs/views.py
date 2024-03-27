@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 
 from .models import Topic, Entry
-from .forms import TropicForm, EntryFrom
+from .forms import TopicForm, EntryForm
 
 
 def index(request):
